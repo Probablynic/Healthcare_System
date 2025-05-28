@@ -1,0 +1,118 @@
+package Proj;
+
+import java.time.LocalDate;
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
+public class AppointmentScheduling {
+    private AppointmentList appointmentList;
+    private PatientRecord patientRecord;
+    private Scanner scanner;
+
+    public AppointmentScheduling(AppointmentList appointmentList, PatientRecord patientRecord,
+                                  ConsultationManagement consultationQueueManagement, Scanner scanner) {
+        this.appointmentList = appointmentList;
+        this.patientRecord = patientRecord;
+        this.scanner = scanner;
+    }
+    public void menu() {
+        while (true) {
+            System.out.println("\n──── Appointment Scheduling ────");
+            System.out.println("1. Schedule Appointment");
+            System.out.println("2. Cancel Appointment");
+            System.out.println("3. Display Appointments");
+            System.out.println("4. Clear Appointments");
+            System.out.println("5. Return to Main Menu");
+            System.out.print("\nEnter Option: ");
+
+            try {
+                int option = scanner.nextInt();
+                scanner.nextLine(); 
+                switch (option) {
+                    case 1: scheduleAppointment();                 break;
+                    case 2: cancelAppointment();                   break;
+                    case 3: displayAppointments();                 break;
+                    case 4: appointmentList.clearAppointments();   break;
+                    case 5: return;
+                    default:
+                        System.out.println("\nInvalid option. Try again.");}
+            } catch (InputMismatchException e) {
+                System.out.println("\nInvalid input. Please enter a valid number.");
+                scanner.nextLine(); 
+            }
+        }
+    }
+    
+    private void scheduleAppointment() {
+        System.out.print("\nEnter Patient ID: ");
+        String patientID = scanner.nextLine().trim();
+        PatientNode patient = patientRecord.getPatient(patientID);
+
+        if (patient == null) {
+            System.out.println("\nPatient not found.");
+            return;
+        }
+        String preferredTime = getPreferredTime();
+        LocalDate appointmentDate = getValidDate();
+
+        appointmentList.addAppointment(patient.getPatientID(), 
+        		                       patient.getFirstName(), 
+        		                       patient.getLastName(),
+                                       patient.getAddress(), 
+                                       patient.getAge(), 
+                                       patient.getContactInfo(), 
+                                       appointmentDate, "Pending", 
+                                       patient.getIllness(), 
+                                       preferredTime);
+        
+        System.out.println("\nAppointment successfully scheduled!");
+        appointmentList.displayAppointments();
+    }
+    
+    private LocalDate getValidDate() {
+        while (true) {
+            try {
+                System.out.print("Enter Appointment Date (MM/DD/YYYY): ");
+                String dateInput = scanner.nextLine().trim();
+                return LocalDate.parse(dateInput, java.time.format.DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+            } catch (Exception e) {
+                System.out.println("\nInvalid date format. Please use MM/DD/YYYY.");
+            }
+        }
+    }
+    
+    private String getPreferredTime() {
+        while (true) {
+            System.out.print("Enter Preferred Time (Morning, Afternoon, Evening): ");
+            String preferredTime = scanner.nextLine().trim().toLowerCase();
+            switch(preferredTime) {
+                case "morning":
+                case "afternoon":
+                case "evening":
+                    return preferredTime.substring(0, 1).toUpperCase() + 
+                    	   preferredTime.substring(1);
+                default:
+                    System.out.println("Invalid input. Please enter "
+                    		+ "'Morning', 'Afternoon', or 'Evening'.");
+            }
+        }
+    }
+    
+    private void cancelAppointment() {
+        System.out.print("\nEnter Patient ID to cancel: ");
+        String patientID = scanner.nextLine().trim();
+        if (appointmentList.removeAppointment(patientID)) {
+            System.out.println("\nAppointment canceled successfully.");
+        } else {
+            System.out.println("\nAppointment not found.");
+        }
+    }
+    
+    private void displayAppointments() {
+        if (appointmentList.isEmpty()) {
+            System.out.println("\nNo appointments available.");
+            return;
+        }
+        appointmentList.displayAppointments();
+    }
+}
