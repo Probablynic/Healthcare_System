@@ -1,0 +1,75 @@
+package Proj;
+
+import java.util.Scanner;
+
+public class ConsultationManagement {
+    private AppointmentList appointmentList;
+    private PatientRecord patientRecord;
+    private Scanner scanner;
+
+    // Constructor
+    public ConsultationManagement(AppointmentList appointmentList, PatientRecord patientRecord, Scanner scanner) {
+        this.appointmentList = appointmentList;
+        this.patientRecord = patientRecord;
+        this.scanner = scanner;
+    }
+
+    // Consultation menu
+    public void menu() {
+        while (true) {
+            System.out.println("\n─────────────── Consultation Menu ───────────────");
+            System.out.println("1. Serve Patient");
+            System.out.println("2. Return to Main Menu");
+            System.out.print("\nEnter option: ");
+
+            try {
+                int option = scanner.nextInt();
+                scanner.nextLine();
+
+                switch (option) {
+                    case 1: servePatient(); break;
+                    case 2: return;
+                    default: System.out.println("\nInvalid option. Please try again.");
+                }
+            } catch (Exception e) {
+                System.out.println("\nInvalid input. Please enter a valid number.");
+                scanner.nextLine(); 
+            }
+        }
+    }
+
+    // Serve a patient by marking their appointment as completed
+    private void servePatient() {
+        if (appointmentList.isEmpty()) {
+            System.out.println("\nNo appointments available.");
+            return;
+        }
+
+        appointmentList.displayAppointments();
+        System.out.print("\nEnter Patient ID to mark as completed: ");
+        String patientID = scanner.nextLine().trim();
+
+        AppointmentNode appointment = appointmentList.getAppointment(patientID);
+        if (appointment == null) {
+            System.out.println("\nPatient not found.");
+            return;
+        }
+
+        if (appointment.isCompleted()) {
+            System.out.println("\nAppointment is already marked as completed.");
+            return;
+        }
+
+        // Mark appointment as completed
+        appointment.setStatus("Completed");
+
+        // Mark PatientRec as completed
+        PatientNode patient = patientRecord.getPatient(patientID);
+        if (patient != null) {
+            patient.setStatus("Completed");
+        }
+
+        System.out.println("\nAppointment marked as completed successfully.");
+        appointmentList.displayAppointments();
+    }
+}
