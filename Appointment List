@@ -1,0 +1,133 @@
+package Proj;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class AppointmentList {
+    private AppointmentNode head; 
+    private int size; 
+    private LocalDateTime timestamp; 
+
+    public AppointmentList() {
+        this.head = null;
+        this.size = 0;
+        this.setTimestamp(LocalDateTime.now());
+    }
+    
+    public AppointmentNode getHead() {
+        return head;
+    }
+    public void addAppointment(String patientID, String firstName, 
+    		                   String lastName,  String address, int age, 
+    		                   String contactInfo, LocalDate appointmentDate, 
+                               String status, String illness, String preferredTime) {
+    	
+        AppointmentNode newAppointment = new AppointmentNode(patientID, firstName, lastName, 
+                address, age, contactInfo, appointmentDate, status, illness, preferredTime);
+  
+        if (head == null) {
+            head = newAppointment; 
+        } else {
+            AppointmentNode current = head;
+            while (current.getNext() != null) {
+                current = current.getNext(); 
+            }
+            current.setNext(newAppointment);
+            newAppointment.setPrev(current); 
+        }
+        size++; 
+    }
+    
+    public boolean removeAppointment(String patientID) {
+        AppointmentNode current = head;
+        while (current != null) {
+            if (current.getPatientID().equals(patientID)) {
+                if (current.getPrev() != null) {
+                    current.getPrev().setNext(current.getNext()); 
+                } else {
+                    head = current.getNext();
+                }
+                if (current.getNext() != null) {
+                    current.getNext().setPrev(current.getPrev()); 
+                }
+                size--; 
+                return true;
+            }
+            current = current.getNext();
+        }
+        return false; 
+    }
+    
+    public AppointmentNode getAppointment(String patientID) {
+        AppointmentNode current = head;
+        while (current != null) {
+            if (current.getPatientID().equals(patientID)) {
+                return current;   
+             }
+            current = current.getNext();
+        }
+        return null; 
+    }
+    
+    public void updateAppointmentStatus(String patientID, String status) {
+        AppointmentNode current = head;
+        while (current != null) {
+            if (current.getPatientID().equals(patientID)) {
+                current.setStatus(status);
+                return;
+            }
+            current = current.getNext();
+        }
+    }
+    
+    public void displayAppointments() {
+        if (head == null) {
+            System.out.println("No appointments to display.");
+            return;
+        }
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); 
+        DateTimeFormatter timestampFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a");
+
+        AppointmentNode current = head;
+        while (current != null) {
+            System.out.println("\n────────────────────────────────");
+            System.out.printf( "      Patient ID: %s      \n", current.getPatientID());
+            System.out.println("────────────────────────────────");
+            System.out.printf( "\nName:           %s %s\n", current.getFirstName(), current.getLastName());
+            System.out.printf( "Age:            %d\n", current.getAge());
+            System.out.printf( "Contact info:   %s\n", current.getContactInfo());
+            System.out.printf( "Address:        %s\n", current.getAddress());
+            System.out.printf( "Illness:        %s\n", current.getIllness());
+            System.out.printf( "Status:         %s\n", current.getStatus());
+            System.out.printf( "Scheduled Date: %s\n", current.getDate().format(dateFormatter));
+            System.out.println("Preferred Time: "+ current.getPreferredTime());  
+            System.out.println("\n"+"  "+ current.getTimestamp().format(timestampFormatter));   
+            System.out.println("────────────────────────────────");
+            current = current.getNext();
+        }
+    }
+    
+    public void clearAppointments() {
+        head = null; 
+        size = 0; 
+        System.out.println("All appointments have been cleared.");
+    }
+    
+    public boolean isEmpty() {
+        return head == null; 
+    }
+    
+    public int getSize() {
+        return size;
+    }
+
+	public LocalDateTime getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(LocalDateTime timestamp) {
+		this.timestamp = timestamp;
+	}
+}
