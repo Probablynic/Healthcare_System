@@ -1,0 +1,76 @@
+package Proj;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+
+public class PatientRecord {
+    private HashMap<String, PatientNode> records;
+
+    public PatientRecord() {
+        records = new HashMap<>();
+    }
+
+    public void addPatient(String patientID, String firstName, String lastName, int age, String contactInfo, String address, String illness) {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss a"); 
+        String dateAdded = now.format(formatter);
+
+        PatientNode newPatient = new PatientNode(patientID, firstName, lastName, age, contactInfo, address, "Pending", dateAdded, illness);
+        records.put(patientID, newPatient);
+
+        int numericID = Integer.parseInt(patientID);
+        if (numericID >= MainLogin.patientCounter) {
+            MainLogin.patientCounter = numericID + 1;
+        }
+
+        System.out.println("\n────────────────────────────────");
+        System.out.println("      Patient Record Added      ");
+        System.out.println("────────────────────────────────");
+        System.out.println(newPatient.getFormattedOutput());
+    }
+
+    public boolean patientExists(String patientID) {
+        return records.containsKey(patientID);
+    }
+
+    public void viewPatient(String patientID) {
+        PatientNode patient = records.get(patientID);
+        if (patient == null) {
+            System.out.println("\nPatient record not found.");
+        } else {
+            System.out.println(patient.getFormattedOutput());
+        }
+    }
+
+    public void updatePatient(String patientID, String firstName, String lastName, int age, String contactInfo, String address, String illness) {
+        PatientNode patient = records.get(patientID);
+        if (patient != null) {
+            patient.setFirstName(firstName);
+            patient.setLastName(lastName);
+            patient.setAge(age);
+            patient.setContactInfo(contactInfo);
+            patient.setAddress(address);
+            patient.setIllness(illness);
+            System.out.println("\nPatient record updated successfully.");
+        }
+    }
+    public void updatePatientStatus(String patientID, String status) {
+        PatientNode patient = records.get(patientID);
+        if (patient != null) {
+            patient.setStatus(status);
+        }
+    }
+
+    public void deletePatient(String patientID) {
+        records.remove(patientID);
+    }
+
+    public void displayAllPatients() {
+        records.values().forEach(patient -> System.out.println(patient.getFormattedOutput()));
+    }
+
+    public PatientNode getPatient(String patientID) {
+        return records.get(patientID);
+    }
+}
