@@ -1,0 +1,250 @@
+package Proj;
+
+import java.util.InputMismatchException;
+import java.util.Scanner;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+public class MainLogin {
+    private static final String adminName = "adminname";
+    private static final String adminPass = "adminpass";
+    private static Scanner scanner = new Scanner(System.in);
+    private static PatientRecord patientRecord = new PatientRecord();
+    private static AppointmentList appointmentList = new AppointmentList();
+    private static ConsultationManagement consultationManagement = new ConsultationManagement(appointmentList, patientRecord, scanner);
+    private static Map<String, String> userAccounts = new HashMap<>();
+    static int patientCounter = 1;
+
+    public static void main(String[] args) {
+        while (true) {
+            try {
+                System.out.println("\n─────── Healthcare System ──────");
+                System.out.println("1. Log In");
+                System.out.println("2. Sign In");
+                System.out.print("\nEnter Option: ");
+                int choice = getUserInput();
+
+                switch (choice) {
+                    case 1: logIn();    break;
+                    case 2: signIn();   break;
+                    default: System.out.println("\nInvalid option. Try again.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("\nInvalid input. Please enter a valid option.");
+                scanner.nextLine();
+            }
+        }
+    }
+
+    private static void logIn() {
+        System.out.println("\n─────────── log In ─────────────");
+        System.out.print("\nEnter Username: ");
+        String username = scanner.nextLine().trim();
+        System.out.print("Enter Password: ");
+        String password = scanner.nextLine().trim();
+
+        if (username.equals(adminName) && password.equals(adminPass)) {
+            System.out.println("Login Successful!");
+            adminMenu();
+        } else if (userAccounts.containsKey(username) && userAccounts.get(username).equals(password)) {
+            System.out.println("Login Successful!\n");
+            userMenu(username);
+        } else {
+            System.out.println("\nInvalid username or password.");
+        }
+    }
+
+    private static void signIn() {
+        System.out.println("\n─────────── Sign Up ────────────");
+        System.out.print("\nEnter Username: ");
+        String username = scanner.nextLine().trim();
+
+        if (userAccounts.containsKey(username)) {
+            System.out.println("\nUsername already exists. Try a different one.");
+            return;
+        }
+
+        System.out.print("Enter Password: ");
+        String password = scanner.nextLine().trim();
+        System.out.print("Confirm Password: ");
+        String confirmPassword = scanner.nextLine().trim();
+
+        if (!password.equals(confirmPassword)) {
+            System.out.println("\nPasswords do not match. Try again.");
+            return;
+        }
+
+        System.out.print("\nEnter First Name:   ");
+        String firstName = scanner.nextLine().trim();
+        System.out.print("Enter Last Name:    ");
+        String lastName = scanner.nextLine().trim();
+        int age = getValidAge();
+        System.out.print("Enter Contact Info: ");
+        String contactInfo = scanner.nextLine().trim();
+        System.out.print("Enter Address:      ");
+        String address = scanner.nextLine().trim();
+        System.out.print("Enter Illness:      ");
+        String illness = scanner.nextLine().trim();
+
+        String patientID = String.format("00%d", patientCounter);
+        patientCounter++; 
+        
+        userAccounts.put(username, password);
+        userAccounts.put(username + "_ID", patientID);
+
+        patientRecord.addPatient(patientID, firstName, lastName, age, contactInfo, address, illness);
+
+        System.out.println("Account created successfully!");
+        System.out.println("\nYour Patient ID: " + patientID);
+        System.out.println("Use this ID for appointments.");
+    }
+
+    private static void adminMenu() {
+        while (true) {
+            try {
+                System.out.println("\n────────── Admin Menu ──────────");
+                System.out.println("1. Appointment Scheduling");
+                System.out.println("2. Patient Record Processing");
+                System.out.println("3. Consultation Queue Management");
+                System.out.println("4. Logout");
+                System.out.print("\nEnter Option: ");
+
+                int option = getUserInput();
+
+                switch (option) {
+                    case 1:
+                        new AppointmentScheduling(appointmentList, patientRecord, null, scanner).menu();
+                        break;
+                    case 2:
+                        new PatientRecordProcessing(patientRecord, scanner).process();
+                        break;
+                    case 3:
+                        consultationManagement.menu();
+                        break;
+                    case 4:
+                        System.out.println("\nLogging out...");
+                        return;
+                    default:
+                        System.out.println("\nInvalid option. Try again.");
+                }
+            } catch (InputMismatchException error) {
+                System.out.println("\nInvalid input. Please enter a valid option.");
+                scanner.nextLine();
+            }
+        }
+    }
+
+    private static void userMenu(String username) {
+        while (true) {
+            System.out.println("\n────────── User Menu ──────────");
+            System.out.println("1. View My Appointments");
+            System.out.println("2. Cancel My Appointment");
+            System.out.println("3. Logout");
+            System.out.print("\nEnter Option: ");
+
+            int option = getUserInput();
+
+            switch (option) {
+                case 1:
+                    String patientID = userAccounts.get(username + "_ID");
+                    displayUserAppointments(patientID);
+                    break;
+                case 2:
+                    patientID = userAccounts.get(username + "_ID");
+                    cancelUserAppointment(patientID);
+                    break;
+                case 3:
+                    System.out.println("\nLogging out...");
+                    return;
+                default:
+                    System.out.println("\nInvalid option. Try again.");
+            }
+        }
+    }
+
+    private static void displayUserAppointments(String patientID) {
+        boolean found = false;
+        AppointmentNode current = appointmentList.getHead();
+        DateTimeFormatter timestampFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a");
+
+
+        while (current != null) {
+            if (current.getPatientID().equalsIgnoreCase(patientID)) {
+                System.out.println("────────────────────────────────\n" +
+                "      Patient ID: " + current.getPatientID() + "\n" +
+                "────────────────────────────────\n" +
+                "Name:           " + current.getFirstName() + " " + current.getLastName() + "\n" +
+                "Age:            " + current.getAge() + "\n" +
+                "Contact Info:   " + current.getContactInfo() + "\n" +
+                "Address:        " + current.getAddress() + "\n" +
+                "Status:         " + current.getStatus() + "\n" +
+                "Scheduled Date: " + current.getAppointmentDate() + "\n" +
+                "Preferred Time: "+ current.getPreferredTime() + "\n" +
+                "\n"+"  "+ current.getTimestamp().format(timestampFormatter)+ "\n" +  
+                "──────────────────────────────");
+                found = true;
+            }
+            current = current.getNext();
+        }
+
+        if (!found) {
+            System.out.println("\nNo appointments found for your account.");
+        }
+    }
+
+    private static int getUserInput() {
+        while (true) {
+            try {
+                int input = scanner.nextInt();
+                scanner.nextLine();
+                return input;
+            } catch (InputMismatchException e) {
+                System.out.println("\nInvalid input. Please enter a valid option.");
+                scanner.nextLine();
+            }
+        }
+    }
+    private static void cancelUserAppointment(String patientID) {
+        if (appointmentList.isEmpty()) {
+            System.out.println("\nNo appointments available to cancel.");
+            return;
+        }
+
+        AppointmentNode appointment = appointmentList.getAppointment(patientID);
+        if (appointment == null) {
+            System.out.println("\nYou have no scheduled appointments.");
+            return;
+        }
+
+        System.out.print("\nAre you sure you want to cancel your appointment? (yes/no): ");
+        String confirmation = scanner.nextLine().trim().toLowerCase();
+
+        if (confirmation.equals("yes")) {
+            if (appointmentList.removeAppointment(patientID)) {
+                System.out.println("\nYour appointment has been successfully canceled.");
+            } else {
+                System.out.println("\nFailed to cancel appointment. Please try again.");
+            }
+        } else {
+            System.out.println("\nCancellation request has been declined.");
+        }
+    }
+
+    private static int getValidAge() {
+        while (true) {
+            try {
+            	System.out.print("Enter Age:          ");
+                int age = scanner.nextInt();
+                scanner.nextLine();
+                if (age > 0) {
+                    return age;
+                }
+                System.out.println("\nAge must be positive. Try again.");
+            } catch (InputMismatchException e) {
+                System.out.println("\nInvalid input. Please enter a valid age.");
+                scanner.nextLine();
+            }
+        }
+    }
+}
