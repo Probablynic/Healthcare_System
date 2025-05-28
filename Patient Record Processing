@@ -1,0 +1,118 @@
+package Proj;
+
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
+public class PatientRecordProcessing {
+    private PatientRecord patientRecord;
+    private Scanner scanner;
+    public PatientRecordProcessing(PatientRecord patientRecord, Scanner scanner) {
+        this.patientRecord = patientRecord;
+        this.scanner = scanner;
+    }
+    public void process() {
+        boolean running = true;
+        while (running) {
+            System.out.println("\n──────── Patient Record ────────");
+            System.out.println("1. Add Patient");
+            System.out.println("2. View Patient");
+            System.out.println("3. Update Patient");
+            System.out.println("4. Delete Patient");
+            System.out.println("5. Display All Patients");
+            System.out.println("6. Exit");
+            System.out.print("\nEnter option: ");
+            try {
+                int choice = scanner.nextInt();
+                scanner.nextLine(); // Clear the buffer
+
+                switch (choice) {
+                    case 1: addPatient();                       break;
+                    case 2: viewPatient();                      break;
+                    case 3: updatePatient();                    break;
+                    case 4: deletePatient();                    break;
+                    case 5: patientRecord.displayAllPatients(); break;
+                    case 6: running = false;
+                        System.out.println("\nExiting Patient Record Management.");
+                        break;
+                    default:
+                        System.out.println("\nInvalid option. Please try again.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("\nInvalid input. Please enter a number.");
+                scanner.nextLine(); 
+            }
+        }
+    }
+    private void addPatient() {
+        System.out.print("\nEnter Patient ID:   ");
+        String patientID = scanner.nextLine();
+
+        if (patientRecord.patientExists(patientID)) {
+            System.out.println("\nPatient with this ID already exists.");
+            return;
+        }
+        System.out.print("Enter First Name:   "); String firstName = scanner.nextLine();
+        System.out.print("Enter Last Name:    "); String lastName = scanner.nextLine();
+        int age = getValidAge();
+        System.out.print("Enter Contact Info: "); String contactInfo = scanner.nextLine();
+        System.out.print("Enter Address:      "); String address = scanner.nextLine();
+        System.out.print("Enter Illness:      "); String illness = scanner.nextLine();
+        patientRecord.addPatient(patientID, firstName, lastName, age, contactInfo, address, illness);  // Pass illness
+    }
+    private void viewPatient() {
+        System.out.print("\nEnter Patient ID to view:  ");
+        String patientID = scanner.nextLine();
+        patientRecord.viewPatient(patientID);
+    }
+    private void updatePatient() {
+        System.out.print("\nEnter Patient ID to update: ");
+        String patientID = scanner.nextLine();
+        if (!patientRecord.patientExists(patientID)) {
+            System.out.println("\nPatient record not found.");
+            return;
+        }
+
+        System.out.print("Enter New First Name:   ");
+        String firstName = scanner.nextLine();
+
+        System.out.print("Enter New Last Name:    ");
+        String lastName = scanner.nextLine();
+
+        int age = getValidAge();
+
+        System.out.print("Enter New Contact Info: ");
+        String contactInfo = scanner.nextLine();
+
+        System.out.print("Enter New Address:      ");
+        String address = scanner.nextLine();
+
+        System.out.print("Enter New Illness:      ");  
+        String illness = scanner.nextLine();
+
+        patientRecord.updatePatient(patientID, firstName, lastName, age, contactInfo, address, illness);  // Pass illness
+    }
+    private void deletePatient() {
+        System.out.print("\nEnter Patient ID to delete: ");
+        String patientID = scanner.nextLine();
+        patientRecord.deletePatient(patientID);
+        System.out.println("\nPatient record deleted successfully.");
+    }
+    private int getValidAge() {
+        int age = -1;
+        while (age < 0) {
+            try {
+                System.out.print("Enter Age:          ");
+                age = scanner.nextInt();
+                scanner.nextLine(); 
+
+                if (age < 0) {
+                    System.out.println("\nAge cannot be negative. Try again.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("\nInvalid age. Please enter a valid number.");
+                scanner.nextLine();
+            }
+        }
+        return age;
+    }
+}
