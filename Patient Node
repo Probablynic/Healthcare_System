@@ -1,0 +1,81 @@
+package Proj;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class PatientNode {
+    private String patientID;
+    private String firstName;
+    private String lastName;
+    private int age;
+    private String contactInfo;
+    private String address;
+    private String status;
+    private String illness;
+    private LocalDateTime timestamp; 
+    
+    public PatientNode(String patientID, String firstName, String lastName, 
+    		           int age, String contactInfo, String address, String status, 
+    		           String dateAdded, String illness) {
+    	
+    this.patientID = patientID;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.age = age;
+    this.contactInfo = contactInfo;
+    this.address = address;
+    this.status = status;
+    this.illness = illness; 
+    this.timestamp = LocalDateTime.now();
+    }
+   
+    public String getPatientID() { return patientID; }
+    
+    public String getFirstName() { return firstName; }
+    
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+    
+    public String getLastName() { return lastName; }
+
+    public void setLastName(String lastName) { this.lastName = lastName; }
+    
+    public int getAge() { return age; }
+    
+    public void setAge(int age) { this.age = age; }
+    
+    public String getContactInfo() { return contactInfo; }
+    
+    public void setContactInfo(String contactInfo) { this.contactInfo = contactInfo; }
+    
+    public String getAddress() { return address; }
+    
+    public String getIllness() { return illness; }
+    
+    public void setIllness(String illness) {  this.illness = illness; }
+    
+    public void setAddress(String address) {  this.address = address; }
+    
+    public String getStatus() {return status; }
+    
+    public void setStatus(String status) { this.status = status; }
+    
+    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
+    
+    public String getFullName() { return firstName + " " + lastName; }
+    
+    public String getFormattedOutput() {
+    	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a");
+        return  "────────────────────────────────" + "\n" +
+                "      Patient ID: " + patientID + "      " + "\n" +
+                "────────────────────────────────" + "\n" +
+                "\n" +
+               "Name:         " + getFullName() + "\n" +
+               "Age:          " + age + "\n" +
+               "Contact info: " + contactInfo + "\n" +
+               "Address:      " + address + "\n" +
+               "Illness:      " + illness + "\n" + 
+               "Status:       " + status + "\n\n" +
+               "  " + timestamp.format(formatter) + "\n" +
+               "────────────────────────────────\n";
+    }
+}
