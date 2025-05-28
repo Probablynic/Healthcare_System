@@ -1,0 +1,106 @@
+package Proj;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class AppointmentNode {
+    private String patientID;
+    private String firstName;
+    private String lastName;
+    private String address;
+    private int age;
+    private String contactInfo;
+    private LocalDate date;          
+    private String status;           
+    private String illness;
+    private LocalDateTime timestamp;    
+    private String preferredTime;    
+    private AppointmentNode next;   
+    private AppointmentNode prev;
+
+    public AppointmentNode(String patientID, String firstName, String lastName, String address, int age,
+                           String contactInfo, LocalDate date, String status, String illness, String preferredTime) {
+        
+    this.patientID = patientID;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.address = address;
+    this.age = age;
+    this.contactInfo = contactInfo;
+    this.date = date;
+    this.status = (status == null) ? "Pending" : status; 
+    this.illness = illness;
+    this.timestamp = LocalDateTime.now();
+    this.preferredTime = preferredTime;
+    this.next = null;
+    this.prev = null;
+    
+    }
+    public String getPatientID() { return patientID; }
+    public void setPatientID(String patientID) { this.patientID = patientID; }
+
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
+    public int getAge() { return age; }
+    public void setAge(int age) { this.age = age; }
+
+    public String getContactInfo() { return contactInfo; }
+    public void setContactInfo(String contactInfo) { this.contactInfo = contactInfo; }
+
+    public LocalDate getDate() { return date; }
+    
+    public void setDate(LocalDate date) { this.date = date; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public String getIllness() { return illness; }
+    public void setIllness(String illness) { this.illness = illness; }
+
+    public LocalDateTime getTimestamp() { return timestamp; }
+    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp;  }
+
+    public String getPreferredTime() { return preferredTime; }
+    public void setPreferredTime(String preferredTime) { this.preferredTime = preferredTime; }
+
+    public AppointmentNode getNext() { return next; }
+    public void setNext(AppointmentNode next) { this.next = next; }
+
+    public AppointmentNode getPrev() { return prev; }
+    public void setPrev(AppointmentNode prev) { this.prev = prev; }
+
+    public boolean isPending() { return "Pending".equalsIgnoreCase(this.status); }
+    public boolean isCompleted() {  return "Completed".equalsIgnoreCase(this.status); }
+
+    public boolean equals(AppointmentNode other) {
+    if (other == null) return false; return this.patientID.equals(other.getPatientID()); }
+
+    public boolean isOnDate(LocalDate specificDate) { return this.date.equals(specificDate); }
+    
+    public LocalDate getAppointmentDate() { return this.date; }
+
+    public String getFormattedOutput() {
+    	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a");
+        return "────────────────────────────────\n" +
+               "      Patient ID: " + patientID + "\n" +
+               "────────────────────────────────\n" +
+               "Name:           " + firstName + " " + lastName + "\n" +
+               "Age:            " + age + "\n" +
+               "Contact Info:   " + contactInfo + "\n" +
+               "Address:        " + address + "\n" +
+               "Illness:        " + illness + "\n" +
+               "Status:         " + status + "\n" +
+               "Scheduled Date: " + date.toString() + "\n" +
+               "Preferred Time: " + preferredTime + "\n" +
+               "\n"+"  "+ timestamp.format(formatter) + "\n" +
+               "────────────────────────────────";
+    }
+}
